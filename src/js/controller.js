@@ -1,3 +1,8 @@
+/******************************************
+ * Controller: manages the application flow
+ * and directs operations between the
+ * model and the views
+ *****************************************/
 import * as model from './model.js';
 import { MODAL_CLOSE_SEC } from './config.js';
 import recipeView from './views/recipeView.js';
@@ -8,16 +13,19 @@ import bookmarksView from './views/bookmarksView.js';
 import addRecipeView from './views/addRecipeView.js';
 
 import 'core-js/stable';
-// import 'regenerator-runtime/runtime';
 
+// Hot module reloading via parcel (Dev only)
 if (module.hot) {
   module.hot.accept();
 }
 
+// Forkify API link
 // https://forkify-api.herokuapp.com/v2
 
-///////////////////////////////////////
-
+/**
+ * Handler function for recipe view
+ * @returns if there is no recipe id in the url
+ */
 const controlRecipes = async function () {
   try {
     const id = window.location.hash.slice(1);
@@ -27,20 +35,24 @@ const controlRecipes = async function () {
     // 0) Update results view to mark selected search result
     resultsView.update(model.getSearchResultsPage());
 
-    // 1) Updating bookmarks view
+    // 1) Update bookmarks view
     bookmarksView.update(model.state.bookmarks);
 
-    // 2) Loading recipe
+    // 2) Load recipe
     await model.loadRecipe(id);
 
-    // 3) Rendering recipe
+    // 3) Render recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
     recipeView.renderError();
   }
 };
-controlRecipes();
+controlRecipes(); //Runs on page load
 
+/**
+ * Handler function for search results view
+ * @returns if there is no search query in the bar
+ */
 const controlSearchResults = async function () {
   try {
     // 1) Get search query
@@ -60,8 +72,12 @@ const controlSearchResults = async function () {
     console.log(err);
   }
 };
-controlSearchResults();
+controlSearchResults(); //Runs on page load
 
+/**
+ * Controls the pagination at the bottom of search results
+ * @param {Integer} goToPage positive integer (page #)
+ */
 const controlPagination = function (goToPage) {
   // 1) Render NEW results
   resultsView.render(model.getSearchResultsPage(goToPage));
@@ -70,6 +86,10 @@ const controlPagination = function (goToPage) {
   paginationView.render(model.state.search);
 };
 
+/**
+ * Controls the updating of serving number
+ * @param {Integer} newServings positive integer (# servings)
+ */
 const controlServings = function (newServings) {
   // Update the recipe servings (in state)
   model.updateServings(newServings);
@@ -80,6 +100,9 @@ const controlServings = function (newServings) {
   //
 };
 
+/**
+ * Controls the addition of a recipe to the bookmarks list
+ */
 const controlAddBookmark = function () {
   // 1) Add or remove bookmark
   if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
@@ -92,10 +115,17 @@ const controlAddBookmark = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
+/**
+ * Controls the list of recipes that are bookmarked
+ */
 const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
+/**
+ * Controls the uploading of a new recipe by the user
+ * @param {Object} newRecipe user-generated recipe object
+ */
 const controlAddRecipe = async function (newRecipe) {
   try {
     // Show loading spinner
@@ -127,6 +157,10 @@ const controlAddRecipe = async function (newRecipe) {
   }
 };
 
+/**
+ * Initialization function to connect controller functions
+ * to event handlers in the views
+ */
 const init = function () {
   bookmarksView.addHandlerRender(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes);

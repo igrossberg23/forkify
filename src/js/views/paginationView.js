@@ -1,9 +1,20 @@
+/******************************************
+ * Pagination View: The pagination below
+ * the search results if there exists
+ * more than 1 page of results
+ *****************************************/
 import View from './View.js';
 import icons from 'url:../../img/icons.svg'; // Parcel 2
 
 class PaginationView extends View {
   _parentElement = document.querySelector('.pagination');
 
+  /**
+   * Takes in controller function to handle user input
+   * on (next-page) or (prev-page) pagination buttons
+   * @param {function} handler
+   * @returns if the event target is not a pagination button
+   */
   addHandlerClick(handler) {
     this._parentElement.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn--inline');
@@ -14,6 +25,11 @@ class PaginationView extends View {
     });
   }
 
+  /**
+   * Determines new page results to be displayed based on
+   * application state and pagination button clicked
+   * @returns HTML Markup
+   */
   _generateMarkup() {
     const curPage = this._data.page;
     const numPages = Math.ceil(
@@ -35,6 +51,12 @@ class PaginationView extends View {
     return '';
   }
 
+  /**
+   * Creates new pagination button markup based on input arguments
+   * @param {integer} prevPage optional page # argument
+   * @param {integer} nextPage optional page # argument
+   * @returns HTML markup
+   */
   _generateMarkupButtons(prevPage, nextPage) {
     let markup = '';
     if (prevPage)

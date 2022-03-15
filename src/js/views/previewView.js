@@ -1,9 +1,18 @@
+/******************************************
+ * Preview View: Any recipe preview. Holds
+ * some information about the recipe but
+ * not as detailed as the full recipeView
+ *****************************************/
 import View from './View.js';
 import icons from 'url:../../img/icons.svg'; // Parcel 2
 
 class PreviewView extends View {
   _parentElement = '';
 
+  /**
+   * Generates recipe preview markup based on id
+   * @returns HTML Markup
+   */
   _generateMarkup() {
     const id = window.location.hash.slice(1);
 

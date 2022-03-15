@@ -1,16 +1,19 @@
+/******************************************
+ * View: Parent class from which all other
+ * views inherit. Sets up universal methods
+ * to be used by each view
+ *****************************************/
 import icons from 'url:../../img/icons.svg'; // Parcel 2
 
 export default class View {
   _data;
 
   /**
-   * Render the  received object to the DOM
+   * Render the received object to the DOM
    * @param {Object | Object[]} data The data to be rendered (e.g. recipe)
    * @param {boolean} [render=true] If false, create markup string instead of rendering to DOM
    * @returns {undefined | string} A markup string is returned if render=false
    * @this {Object} View instance
-   * @author Isaac Grossberg
-   * @todo Finish implementation
    */
   render(data, render = true) {
     if (!data || (Array.isArray(data) && data.length === 0))
@@ -25,10 +28,16 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  /** Clears the parent element */
   _clear() {
     this._parentElement.innerHTML = '';
   }
 
+  /**
+   * Updates the view by only re-rendering the DOM elements that have
+   * changed.
+   * @param {*} data DOM object to be held by child view for future manipulation
+   */
   update(data) {
     this._data = data;
     const newMarkup = this._generateMarkup();
@@ -56,6 +65,9 @@ export default class View {
     });
   }
 
+  /**
+   * Renders a loading spinner in the parent element to represent loading time
+   */
   renderSpinner() {
     const markup = `
       <div class="spinner">
@@ -68,6 +80,10 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  /**
+   * Renders an error message on the parent element
+   * @param {String} msg Error message to be displayed
+   */
   renderError(msg = this._errorMesssage) {
     const markup = `<div class="error">
       <div>
@@ -81,6 +97,10 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
+  /**
+   * Renders a message on the parent element
+   * @param {String} msg Non-error message to be displayed
+   */
   renderMessage(msg = this._message) {
     const markup = `
       <div class="message">

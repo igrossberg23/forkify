@@ -1,7 +1,13 @@
+/******************************************
+ * Model: holds the program state and
+ * handles business processes behind
+ * the scenes
+ *****************************************/
 import { API_URL, RES_PER_PAGE, KEY } from './config.js';
 import { getJSON, sendJSON } from './helpers.js';
 import { AJAX } from './helpers.js';
 
+// Program State
 export const state = {
   recipe: {},
   search: {
@@ -13,6 +19,11 @@ export const state = {
   bookmarks: [],
 };
 
+/**
+ * Format Recipe Object for use in the application
+ * @param {Object} data recipe object in the format returned by forkify API
+ * @returns {Object} recipe object in a standardized format
+ */
 const createRecipeObject = function (data) {
   const { recipe } = data.data;
   return {
@@ -28,6 +39,10 @@ const createRecipeObject = function (data) {
   };
 };
 
+/**
+ * Loads a specific recipe based on its unique id to the state
+ * @param {String} id alphanumeric id asociated with a recipe
+ */
 export const loadRecipe = async function (id) {
   try {
     const data = await AJAX(`${API_URL}${id}?key=${KEY}`);
@@ -41,9 +56,13 @@ export const loadRecipe = async function (id) {
   }
 };
 
+/**
+ * Loads all search results from forkify API based on search query
+ * @param {String} query Search query for results page
+ */
 export const loadSearchResults = async function (query) {
   try {
-    state.search.page = 1; // NOTE: Jonas put this at end of try
+    state.search.page = 1;
     state.search.query = query;
     const data = await AJAX(`${API_URL}?search=${query}&key=${KEY}`);
 
@@ -62,6 +81,11 @@ export const loadSearchResults = async function (query) {
   }
 };
 
+/**
+ * Retrieves array of recipes to be displayed on the results view
+ * @param {Integer} page Page #
+ * @returns {Recipe[]} Array of recipes to be displayed
+ */
 export const getSearchResultsPage = function (page = state.search.page) {
   state.search.page = page;
   const start = (page - 1) * state.search.resultsPerPage;
@@ -69,6 +93,10 @@ export const getSearchResultsPage = function (page = state.search.page) {
   return state.search.results.slice(start, end);
 };
 
+/**
+ * Updates state based on servings change initiated by user
+ * @param {Integer} newServings Positive integer for current servings
+ */
 export const updateServings = function (newServings) {
   state.recipe.ingredients.forEach(ing => {
     // newQt = oldQt * newServings / oldServings
@@ -78,10 +106,17 @@ export const updateServings = function (newServings) {
   state.recipe.servings = newServings;
 };
 
+/**
+ * Commits bookmarks to local storage in the browser
+ */
 const persistBookmarks = function () {
   localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
 };
 
+/**
+ * Adds input recipe to bookmarks array in state
+ * @param {Object} recipe recipe to be added to bookmarks
+ */
 export const addBookmark = function (recipe) {
   // Add bookmark to state
   state.bookmarks.push(recipe);
@@ -92,8 +127,12 @@ export const addBookmark = function (recipe) {
   persistBookmarks();
 };
 
+/**
+ * Removes a recipe from the bookmarks array in state
+ * @param {String} id alphanumeric id of recipe to be deleted
+ */
 export const deleteBookmark = function (id) {
-  // Delete bookmark to state
+  // Delete bookmark in state
   const index = state.bookmarks.findIndex(el => el.id === id);
   state.bookmarks.splice(index, 1);
 
@@ -103,17 +142,28 @@ export const deleteBookmark = function (id) {
   persistBookmarks();
 };
 
+/**
+ * Initialization function. Currently only retrieves bookmarks
+ * from local storage
+ */
 const init = function () {
   const storage = localStorage.getItem('bookmarks');
   if (storage) state.bookmarks = JSON.parse(storage);
 };
 init();
 
+/**
+ * Dev function used to programmatically clear bookmarks
+ */
 const clearBookmarks = function () {
   localStorage.clear('bookmarks');
 };
 // clearBookmarks();
 
+/**
+ * Uploads a user-generated recipe to the forkify API
+ * @param {Object} newRecipe recipe object to be uploaded
+ */
 export const uploadRecipe = async function (newRecipe) {
   try {
     const ingredients = Object.entries(newRecipe)

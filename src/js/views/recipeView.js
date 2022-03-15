@@ -1,7 +1,11 @@
+/******************************************
+ * Recipe View: Area of the window that
+ * displays the currently selected
+ * recipe
+ *****************************************/
 import View from './View.js';
 
-// import icons from '../img/icons.svg'; // Parcel 1
-import icons from 'url:../../img/icons.svg'; // Parcel 2
+import icons from 'url:../../img/icons.svg'; // NOTE: 'url' syntax only for Parcel@2.0.0
 import fracty from 'fracty';
 
 class RecipeView extends View {
@@ -9,12 +13,22 @@ class RecipeView extends View {
   _errorMesssage = 'We could not find that recipe. Please try another one!';
   _message = 'Default message! :)';
 
+  /**
+   * Takes in controller function to handle recipe rendering
+   * and attaches it to an event listener
+   * @param {function} handler
+   */
   addHandlerRender(handler) {
     ['hashchange', 'load'].forEach(event =>
       window.addEventListener(event, handler)
     );
   }
 
+  /**
+   * Takes in controller function to handle updating servings
+   * and attaches it to (+/-) serving buttons
+   * @param {function} handler
+   */
   addHandlerUpdateServings(handler) {
     this._parentElement.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn--update-servings');
@@ -24,6 +38,11 @@ class RecipeView extends View {
     });
   }
 
+  /**
+   * Takes in controller function to handle adding bookmarks
+   * and attaches it to bookmark button
+   * @param {function} handler
+   */
   addHandlerAddBookmark(handler) {
     this._parentElement.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn--bookmark');
@@ -32,6 +51,10 @@ class RecipeView extends View {
     });
   }
 
+  /**
+   * Pulls from data to create markup for selected recipe
+   * @returns HTML to be rendered
+   */
   _generateMarkup() {
     return `
       <figure class="recipe__fig">
@@ -124,6 +147,11 @@ class RecipeView extends View {
       </div>`;
   }
 
+  /**
+   * Generates markup for ingredient
+   * @param {Object} ing single ingredient object
+   * @returns HTML to be rendered
+   */
   _generateIngredientMarkup(ing) {
     return `
       <li class="recipe__ingredient">
